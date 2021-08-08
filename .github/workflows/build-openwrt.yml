@@ -15,8 +15,12 @@ on:
         default: 'ssh-actions'
 
 #定时触发开始编译(把下面两个#去掉开启,时间设置请看定时编译说明)
-#  schedule:
-#   - cron: 0 16 */2 * *
+  schedule:
+   - cron: 0 16 */2 * *
+
+#点☆Star触发开始编译
+  watch:
+    types: started
 
 env:
   Github: https://github.com/${{github.repository}}
@@ -35,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [Lede_source,Lienol_source,Mortal_source,openwrt_amlogic]
+        target: [Lede_source]
 
         # [Lede_source,Lienol_source,Mortal_source,openwrt_amlogic]
 
@@ -190,7 +194,7 @@ jobs:
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 V=s
+        make -j$(nproc) || make -j4 V=s
         echo "::set-output name=status::success"
         echo "date=$(date "+%Y%m%d%H%M%S")" >> $GITHUB_ENV
         echo "date1=$(date +'%m.%d')" >> $GITHUB_ENV
@@ -199,7 +203,7 @@ jobs:
       uses: actions/upload-artifact@v2
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: filename+ipk_${{ env.CODE }}_${{ env.TARGET_PROFILE }}_${{ env.Compile_Date }}
+        name: 313filename+ipk_${{ env.CODE }}_${{ env.TARGET_PROFILE }}_${{ env.Compile_Date }}
         path: openwrt/bin
     
     - name: 整理固件文件夹
